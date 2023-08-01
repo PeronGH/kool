@@ -9,6 +9,12 @@ export const randomSelector: KeyPoolSelector = (keys) => {
 export function makeLRUSelector(
   initialFrequencies?: Map<string, number>,
 ): KeyPoolSelector {
+  if (initialFrequencies) {
+    if ([...initialFrequencies.values()].some((v) => v < 0)) {
+      throw new Error("Initial frequencies cannot be negative");
+    }
+  }
+
   const frequencies = new Map(initialFrequencies);
 
   return (keys) => {
