@@ -3,7 +3,7 @@ import { cached, callable, KeyPool, makeLRUSelector } from "./mod.ts";
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
 
-const keys = callable(cached<string[]>({
+const keys = callable(cached({
   async get() {
     const result = await kv.get<string[]>(key);
     return result.value ?? [];
