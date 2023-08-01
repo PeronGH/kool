@@ -1,9 +1,9 @@
-import { cached, KeyPool, makeLRUSelector } from "./mod.ts";
+import { cached, callable, KeyPool, makeLRUSelector } from "./mod.ts";
 
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
 
-const keys = cached<string[]>({
+const keys = callable(cached<string[]>({
   async get() {
     const result = await kv.get<string[]>(key);
     return result.value ?? [];
@@ -11,10 +11,10 @@ const keys = cached<string[]>({
   async set(value) {
     await kv.set(key, value);
   },
-});
+}));
 
 const keyPool = new KeyPool({
-  keys: keys.get,
+  keys,
   selector: makeLRUSelector(),
 });
 
