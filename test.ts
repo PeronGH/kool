@@ -1,11 +1,8 @@
-import { makeLRUSelector, newKeyPool } from "./mod.ts";
+import { KeyPool, makeLRUSelector } from "./mod.ts";
 import { assertEquals } from "https://deno.land/std@0.196.0/assert/assert_equals.ts";
 
-Deno.test("KeyPool", async () => {
-  const keyPool = await newKeyPool({
-    source: () => ["a", "b", "c"],
-    selector: makeLRUSelector(),
-  });
+Deno.test("KeyPool", () => {
+  const keyPool = new KeyPool(["a", "b", "c"], makeLRUSelector());
 
   assertEquals(keyPool.select(), "a");
   assertEquals(keyPool.select(), "b");

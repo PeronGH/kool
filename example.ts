@@ -1,4 +1,4 @@
-import { makeLRUSelector, newKeyPool } from "./mod.ts";
+import { KeyPool, makeLRUSelector } from "./mod.ts";
 
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
@@ -8,13 +8,10 @@ await kv.atomic()
   .set(key, ["a", "b", "c"])
   .commit();
 
-const keyPool = await newKeyPool({
-  async source() {
-    const { value: keys } = await kv.get<string[]>(key);
-    return keys!;
-  },
-  selector: makeLRUSelector(),
-});
+const keyPool = new KeyPool(
+  (await kv.get<string[]>(key)).value!,
+  makeLRUSelector(),
+);
 
 Deno.serve(async (req) => {
   if (req.method !== "GET") {
