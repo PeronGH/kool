@@ -6,14 +6,19 @@ export const randomSelector: KeyPoolSelector = (keys) => {
 };
 
 export function makeLRUSelector(): KeyPoolSelector {
-  const frequencies = new Map();
+  const frequencies = new Map<string, number>();
 
   return (keys) => {
     let min = Infinity;
     let minKey: string | undefined;
 
     for (const key of keys) {
-      const frequency = frequencies.get(key) ?? 0;
+      const frequency = frequencies.get(key);
+
+      if (frequency === undefined) {
+        frequencies.set(key, 1);
+        return key;
+      }
 
       if (frequency < min) {
         min = frequency;
