@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
       return new Response(await keyPool.select());
     case "/new": {
       const randomHex = Math.random().toString(16).slice(2);
-      const newKeys = [...await keys.get(), randomHex];
+      const newKeys = [...await keys(), randomHex];
       await keys.set(newKeys);
 
       return new Response(randomHex);

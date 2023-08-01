@@ -14,7 +14,7 @@ Deno.test("KeyPool", async () => {
   assertEquals(await keyPool.select(), "c");
   assertEquals(await keyPool.select(), "a");
 
-  keys.set([...await keys.get(), "d"]);
+  keys.set([...await keys(), "d"]);
 
   assertEquals(await keyPool.select(), "d");
   assertEquals(await keyPool.select(), "b");
