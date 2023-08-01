@@ -8,10 +8,10 @@ await kv.atomic()
   .set(key, ["a", "b", "c"])
   .commit();
 
-const keyPool = new KeyPool(
-  (await kv.get<string[]>(key)).value!,
-  makeLRUSelector(),
-);
+const keyPool = new KeyPool({
+  keys: async () => (await kv.get<string[]>(key)).value!,
+  selector: makeLRUSelector(),
+});
 
 Deno.serve(async (req) => {
   if (req.method !== "GET") {
@@ -22,15 +22,12 @@ Deno.serve(async (req) => {
 
   switch (pathname) {
     case "/":
-      return new Response(keyPool.select());
+      return new Response(await keyPool.select());
     case "/new": {
       const { value: keys } = await kv.get<string[]>(key);
-
       const randomHex = Math.random().toString(16).slice(2);
       const newKeys = [...keys!, randomHex];
-
       await kv.set(key, newKeys);
-      keyPool.setKeys(newKeys);
 
       return new Response(randomHex);
     }

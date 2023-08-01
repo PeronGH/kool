@@ -1,22 +1,21 @@
-import type { KeyPoolSelector } from "./types.ts";
+import type {
+  KeyPoolInitializer,
+  KeyPoolKeys,
+  KeyPoolSelector,
+} from "./types.ts";
 
 export class KeyPool {
   readonly #selector: KeyPoolSelector;
-  #keys: string[];
+  readonly #keys: KeyPoolKeys;
 
-  constructor(
-    keys: string[],
-    selector: KeyPoolSelector,
-  ) {
+  constructor({ keys, selector }: KeyPoolInitializer) {
     this.#keys = keys;
     this.#selector = selector;
   }
 
-  setKeys(keys: string[]): void {
-    this.#keys = [...keys];
-  }
-
-  select(): string | null {
-    return this.#selector(this.#keys) ?? null;
+  async select(): Promise<string | null> {
+    return await this.#selector(await this.#keys()) ?? null;
   }
 }
+
+export class AsyncKeyPool extends KeyPool {}
