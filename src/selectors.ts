@@ -6,8 +6,10 @@ export const randomSelector: KeyPoolSelector = (keys) => {
   return keys.at(index);
 };
 
-export function makeLRUSelector(): KeyPoolSelector {
-  const frequencies = new Map<string, number>();
+export function makeLRUSelector(
+  initialFrequencies?: Map<string, number>,
+): KeyPoolSelector {
+  const frequencies = new Map(initialFrequencies);
 
   return (keys) => {
     let min = Infinity;
