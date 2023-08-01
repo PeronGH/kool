@@ -7,7 +7,7 @@ const key = ["foo", "bar"];
 const keys = cached<string[]>({
   async get() {
     const result = await kv.get<string[]>(key);
-    return result.value!;
+    return result.value ?? [];
   },
   async set(value) {
     await kv.set(key, value);
