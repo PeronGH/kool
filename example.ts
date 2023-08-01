@@ -1,5 +1,4 @@
-import { KeyPool, makeLRUSelector } from "./mod.ts";
-import { cached } from "./src/keys.ts";
+import { cached, KeyPool, makeLRUSelector } from "./mod.ts";
 
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
