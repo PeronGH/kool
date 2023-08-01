@@ -5,6 +5,19 @@ export type ValueStore<T> = {
   set: (value: T) => MaybePromise<void>;
 };
 
+export type CallableValueStore<T> = ValueStore<T> & (() => MaybePromise<T>);
+
+export function store<T>(value: T): ValueStore<T> {
+  return {
+    get() {
+      return value;
+    },
+    set(newValue) {
+      value = newValue;
+    },
+  };
+}
+
 export function cached<T>({ get, set }: ValueStore<T>): ValueStore<T> {
   let value: T | null = null;
 
@@ -21,4 +34,8 @@ export function cached<T>({ get, set }: ValueStore<T>): ValueStore<T> {
       await set(newValue);
     },
   };
+}
+
+export function callable<T>(store: ValueStore<T>): CallableValueStore<T> {
+  return Object.assign(() => store.get(), store);
 }
