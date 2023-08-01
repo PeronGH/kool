@@ -1,4 +1,4 @@
-import { KeyPoolSelector } from "./types.ts";
+import { KeyPoolSelector } from "./core.ts";
 
 export const randomSelector: KeyPoolSelector = (keys) => {
   const index = Math.floor(Math.random() * keys.length);

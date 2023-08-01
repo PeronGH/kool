@@ -1,15 +1,21 @@
 import { KeyPool, makeLRUSelector } from "./mod.ts";
+import { cached } from "./src/keys.ts";
 
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
 
-await kv.atomic()
-  .check({ key, versionstamp: null })
-  .set(key, ["a", "b", "c"])
-  .commit();
+const keys = cached<string[]>({
+  async get() {
+    const result = await kv.get<string[]>(key);
+    return result.value!;
+  },
+  async set(value) {
+    await kv.set(key, value);
+  },
+});
 
 const keyPool = new KeyPool({
-  keys: async () => (await kv.get<string[]>(key)).value!,
+  keys: keys.get,
   selector: makeLRUSelector(),
 });
 
@@ -24,10 +30,9 @@ Deno.serve(async (req) => {
     case "/":
       return new Response(await keyPool.select());
     case "/new": {
-      const { value: keys } = await kv.get<string[]>(key);
       const randomHex = Math.random().toString(16).slice(2);
-      const newKeys = [...keys!, randomHex];
-      await kv.set(key, newKeys);
+      const newKeys = [...await keys.get(), randomHex];
+      await keys.set(newKeys);
 
       return new Response(randomHex);
     }

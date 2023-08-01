@@ -1,8 +1,15 @@
-import type {
-  KeyPoolInitializer,
-  KeyPoolKeys,
-  KeyPoolSelector,
-} from "./types.ts";
+import type { MaybePromise } from "./utils.ts";
+
+export type KeyPoolSelector = (
+  keys: string[],
+) => MaybePromise<string | null | undefined>;
+
+export type KeyPoolKeys = () => MaybePromise<string[]>;
+
+export type KeyPoolInitializer = {
+  selector: KeyPoolSelector;
+  keys: KeyPoolKeys;
+};
 
 export class KeyPool {
   readonly #selector: KeyPoolSelector;
