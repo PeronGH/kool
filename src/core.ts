@@ -24,5 +24,3 @@ export class KeyPool {
     return await this.#selector(await this.#keys()) ?? null;
   }
 }
-
-export class AsyncKeyPool extends KeyPool {}
