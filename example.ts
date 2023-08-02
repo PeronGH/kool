@@ -1,4 +1,4 @@
-import { cached, callable, KeyPool, makeLRUSelector } from "./mod.ts";
+import { cached, callable, makeKeyGetter, makeLRUSelector } from "./mod.ts";
 
 const kv = await Deno.openKv();
 const key = ["foo", "bar"];
@@ -13,10 +13,7 @@ const keys = callable(cached({
   },
 }));
 
-const keyPool = new KeyPool({
-  keys,
-  selector: makeLRUSelector(),
-});
+const getKey = makeKeyGetter(keys, makeLRUSelector());
 
 Deno.serve(async (req) => {
   if (req.method !== "GET") {
@@ -27,7 +24,7 @@ Deno.serve(async (req) => {
 
   switch (pathname) {
     case "/":
-      return new Response(await keyPool.select());
+      return new Response(await getKey());
     case "/new": {
       const randomHex = Math.random().toString(16).slice(2);
       const newKeys = [...await keys(), randomHex];

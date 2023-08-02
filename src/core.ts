@@ -6,21 +6,6 @@ export type KeyPoolSelector = (
 
 export type KeyPoolKeys = () => MaybePromise<string[]>;
 
-export type KeyPoolInitializer = {
-  selector: KeyPoolSelector;
-  keys: KeyPoolKeys;
-};
-
-export class KeyPool {
-  readonly #selector: KeyPoolSelector;
-  readonly #keys: KeyPoolKeys;
-
-  constructor({ keys, selector }: KeyPoolInitializer) {
-    this.#keys = keys;
-    this.#selector = selector;
-  }
-
-  async select(): Promise<string | null> {
-    return await this.#selector(await this.#keys()) ?? null;
-  }
+export function makeKeyGetter(keys: KeyPoolKeys, selector: KeyPoolSelector) {
+  return async () => await selector(await keys()) ?? null;
 }
