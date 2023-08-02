@@ -1,14 +1,14 @@
-import { KeyPoolSelector } from "./core.ts";
+import { KeyPoolSelector, KeyPoolSelectorSync } from "./core.ts";
 import type { MaybePromise } from "./utils.ts";
 
-export const randomSelector: KeyPoolSelector = (keys) => {
+export const randomSelector: KeyPoolSelectorSync = (keys) => {
   const index = Math.floor(Math.random() * keys.length);
   return keys.at(index);
 };
 
 export function makeLRUSelector(
   initialFrequencies?: Map<string, number>,
-): KeyPoolSelector {
+): KeyPoolSelectorSync {
   if (initialFrequencies) {
     if ([...initialFrequencies.values()].some((v) => v < 0)) {
       throw new Error("Initial frequencies cannot be negative");

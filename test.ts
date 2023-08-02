@@ -1,18 +1,18 @@
-import { callable, makeKeyGetter, makeLRUSelector, store } from "./mod.ts";
+import { callable, makeLRUSelector, makeSyncKeyGetter, store } from "./mod.ts";
 import { assertEquals } from "https://deno.land/std@0.196.0/assert/assert_equals.ts";
 
-Deno.test("GetKey", async () => {
+Deno.test("GetKey", () => {
   const keys = callable(store(["a", "b", "c"]));
 
-  const getKey = makeKeyGetter(keys, makeLRUSelector());
+  const getKey = makeSyncKeyGetter(keys, makeLRUSelector());
 
-  assertEquals(await getKey(), "a");
-  assertEquals(await getKey(), "b");
-  assertEquals(await getKey(), "c");
-  assertEquals(await getKey(), "a");
+  assertEquals(getKey(), "a");
+  assertEquals(getKey(), "b");
+  assertEquals(getKey(), "c");
+  assertEquals(getKey(), "a");
 
-  keys.set([...await keys(), "d"]);
+  keys.set([...keys(), "d"]);
 
-  assertEquals(await getKey(), "d");
-  assertEquals(await getKey(), "b");
+  assertEquals(getKey(), "d");
+  assertEquals(getKey(), "b");
 });
