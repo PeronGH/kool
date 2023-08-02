@@ -1,6 +1,6 @@
 # Kool
 
-Minimalistic Key Pool Implementation with Utilities for Deno
+Minimalistic **K**ey P**ool** Implementation with Utilities for Deno
 
 ## Usage
 
