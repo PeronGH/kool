@@ -30,6 +30,8 @@ export function cached<T>({ get, set }: ValueStore<T>): ValueStore<T> {
       return value;
     },
     async set(newValue) {
+      if (value === newValue) return;
+
       value = newValue;
       await set(newValue);
     },
