@@ -1,11 +1,15 @@
 import type { MaybePromise } from "./utils.ts";
 
 export type ValueStore<T> = {
-  get: () => MaybePromise<T>;
-  set: (value: T) => MaybePromise<void>;
+  get(): MaybePromise<T>;
+  set(value: T): MaybePromise<void>;
 };
 
-export type CallableValueStore<T> = ValueStore<T> & (() => MaybePromise<T>);
+export type CachedValueStore<T> = ValueStore<T> & { expire(): void };
+
+export type Callable<V> = V extends ValueStore<infer U>
+  ? (V & (() => MaybePromise<U>))
+  : never;
 
 export function store<T>(value: T): ValueStore<T> {
   return {
@@ -18,7 +22,7 @@ export function store<T>(value: T): ValueStore<T> {
   };
 }
 
-export function cached<T>({ get, set }: ValueStore<T>): ValueStore<T> {
+export function cached<T>({ get, set }: ValueStore<T>): CachedValueStore<T> {
   let value: T | null = null;
 
   return {
@@ -29,15 +33,20 @@ export function cached<T>({ get, set }: ValueStore<T>): ValueStore<T> {
 
       return value;
     },
+
     async set(newValue) {
       if (value === newValue) return;
 
       value = newValue;
       await set(newValue);
     },
+
+    expire() {
+      value = null;
+    },
   };
 }
 
-export function callable<T>(store: ValueStore<T>): CallableValueStore<T> {
-  return Object.assign(() => store.get(), store);
+export function callable<T, V extends ValueStore<T>>(store: V): Callable<V> {
+  return Object.assign(() => store.get(), store) as Callable<V>;
 }
