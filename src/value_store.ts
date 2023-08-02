@@ -5,13 +5,19 @@ export type ValueStore<T> = {
   set(value: T): MaybePromise<void>;
 };
 
-export type CachedValueStore<T> = ValueStore<T> & { expire(): void };
+export interface ValueStoreSync<T> extends ValueStore<T> {
+  get(): T;
+  set(value: T): void;
+}
 
-export type Callable<V> = V extends ValueStore<infer U>
-  ? (V & (() => MaybePromise<U>))
+export interface CachedValueStore<T> extends ValueStore<T> {
+  expire(): void;
+}
+
+export type Callable<V> = V extends ValueStore<unknown> ? (V & (V["get"]))
   : never;
 
-export function store<T>(value: T): ValueStore<T> {
+export function store<T>(value: T): ValueStoreSync<T> {
   return {
     get() {
       return value;
@@ -47,6 +53,6 @@ export function cached<T>({ get, set }: ValueStore<T>): CachedValueStore<T> {
   };
 }
 
-export function callable<T, V extends ValueStore<T>>(store: V): Callable<V> {
+export function callable<V extends ValueStore<unknown>>(store: V): Callable<V> {
   return Object.assign(() => store.get(), store) as Callable<V>;
 }
